@@ -6,54 +6,9 @@ name: Beta
       - v*-beta
 
 jobs:
-  prerelease:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Setup golang
-        uses: actions/setup-go@v5
-        with:
-          go-version: '^1.21.0'
-
-      - name: Setup nodejs
-        uses: actions/setup-node@v4
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: web/package-lock.json
-
-      - name: Install go-task
-        run: |
-          go install github.com/go-task/task/v3/cmd/task@latest
-
-      - name: Install rpm
-        run: |
-          sudo apt update && sudo apt-get install rpm
-
-      - name: Install deps
-        run: |
-          task deps
-
-      - name: Import gnupg
-        run: |
-          echo "${{ secrets.GPG_KEY }}" | tr " " "\n" | base64 -d | gpg --import --batch
-          gpg --sign -u "58A7 CC3D 8A9C A2E5 BB5C 141D 4064 23EA F814 63CA" --pinentry-mode loopback --yes --batch --passphrase "${{ secrets.GPG_PASS }}" --output unlock.sig --detach-sign README.md
-          rm -f unlock.sig
-
-      - name: Reset repo
-        run: |
-          git reset --hard
-
-      - name: Run release
-        run: |
-          GITHUB_TOKEN=${{ secrets.GH_TOKEN }} task release:prod
 
   deploy-beta:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'semaphoreui'
 
     steps:
       - name: Checkout source
@@ -80,10 +35,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
-            semaphoreui/semaphore
+            nekotov/semaphore
           labels: |
             org.opencontainers.image.vendor=SemaphoreUI
-            maintainer=Semaphore UI <support@semui.co>
+            maintainer=P. Dembytskyi <@nekotov>
           tags: |
             type=raw,value=${{ github.ref_name }}
           flavor: |
@@ -106,10 +61,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
-            semaphoreui/runner
+            nekotov/semaphore
           labels: |
             org.opencontainers.image.vendor=SemaphoreUI
-            maintainer=Semaphore UI <support@semui.co>
+            maintainer=P. Dembytskyi <@nekotov>
           tags: |
             type=raw,value=${{ github.ref_name }}
           flavor: |
