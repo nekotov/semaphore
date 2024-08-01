@@ -1,4 +1,4 @@
-# Semaphore with OpenLDAP example
+# Semaphore with OpenLDAP example 
 
 1. Start stack by command:
    ```
